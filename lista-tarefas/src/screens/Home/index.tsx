@@ -1,40 +1,34 @@
 import { StatusBar } from 'expo-status-bar';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
-
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { useContext, useEffect, useState } from 'react';
 import { InputAddTask } from '../../components/InputAddTask';
 import { CardNumber } from '../../components/CardNumber';
 import { Task } from '../../components/Task';
 import { TaskContext } from '../../context/TaskContext';
 import { TaskProps } from '../../utils/types';
-type Task = {
-  description: string;
-  check: boolean;
-};
+
 export default function Home() {
   const { tasks, createTask, setTasks } = useContext(TaskContext);
 
-  const [tarefa, setTarefa] = useState('');
-  const [tasksText, setTasksText] = useState('');
   const [countTask, setCountTask] = useState(0);
   const [countTaskAberta, setCountTaskAberta] = useState(0);
   const [countTaskFinalizada, setCountTaskFinalizada] = useState(0);
-  const [status, setStatus] = useState(false);
 
-  function handleTaskAdd() {
-    if (tasksText === '') {
-      return Alert.alert('Erro', 'Tarefa sem descrição');
-    }
-    if (tasks.some((tasks) => tasks.title === tasksText)) {
+  const TaskScheme = Yup.object().shape({
+    tasksText: Yup.string().min(4, 'No mínimo 4 caracteres').max(16, 'No máximo 16 caracteres').required('Título da tarefa não pode ser vazio'),
+  });
+
+  function handleTaskAdd(tasksText: string) {
+    if (tasks.some((task) => task.title === tasksText)) {
       return Alert.alert('Erro', 'Tarefa já existe');
     }
-
     createTask(tasksText);
-    setTasksText('');
   }
 
   const handleTaskChangeStatus = (taskToChange: TaskProps) => {
-    const updatedTasks = tasks.filter((tasks) => tasks.title !== taskToChange.title);
+    const updatedTasks = tasks.filter((task) => task.title !== taskToChange.title);
     const newTask = {
       id: taskToChange.id,
       title: taskToChange.title,
@@ -49,7 +43,7 @@ export default function Home() {
       {
         text: 'Sim',
         onPress: () => {
-          const updatedTasks = tasks.filter((tasks) => tasks.title != taskToDelete.title);
+          const updatedTasks = tasks.filter((task) => task.title !== taskToDelete.title);
           setTasks(updatedTasks);
         },
       },
@@ -59,22 +53,38 @@ export default function Home() {
 
   useEffect(() => {
     let totalTasks = tasks.length;
-    const filterArrayTasksAbertas = tasks.filter((tasks) => tasks.status == false);
-    const filterArrayTasksFinalizadas = tasks.filter((tasks) => tasks.status == true);
-    if (filterArrayTasksAbertas) setCountTaskAberta(filterArrayTasksAbertas.length);
-    if (filterArrayTasksFinalizadas) setCountTaskFinalizada(filterArrayTasksFinalizadas.length);
+    const filterArrayTasksAbertas = tasks.filter((task) => task.status === false);
+    const filterArrayTasksFinalizadas = tasks.filter((task) => task.status === true);
+    setCountTaskAberta(filterArrayTasksAbertas.length);
+    setCountTaskFinalizada(filterArrayTasksFinalizadas.length);
     setCountTask(totalTasks);
   }, [tasks]);
 
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <InputAddTask onChangeText={setTasksText} value={tasksText} onPress={handleTaskAdd} />
+      <Formik
+        initialValues={{ tasksText: '' }}
+        validationSchema={TaskScheme}
+        onSubmit={(values, { resetForm }) => {
+          handleTaskAdd(values.tasksText);
+          resetForm({ values: { tasksText: '' } });
+        }}
+      >
+        {({ handleSubmit, handleChange, handleBlur, values, errors, touched }) => (
+          <View>
+            <InputAddTask onChangeText={handleChange('tasksText')} value={values.tasksText} onPress={handleSubmit} onBlur={handleBlur('tasksText')} />
+            {touched.tasksText && errors.tasksText && <Text style={{ color: '#ff8477' }}>{errors.tasksText}</Text>}
+          </View>
+        )}
+      </Formik>
+
       <View style={styles.row}>
-        <CardNumber value={countTask} title={'Cadastradas'} color={'#1e1e1e'} />
-        <CardNumber value={countTaskAberta} title={'Em aberto'} color={'#e88a1a'} />
-        <CardNumber value={countTaskFinalizada} title={'Finalizadas'} color={'#0e9577'} />
+        <CardNumber value={countTask} title="Cadastradas" color="#1e1e1e" />
+        <CardNumber value={countTaskAberta} title="Em aberto" color="#e88a1a" />
+        <CardNumber value={countTaskFinalizada} title="Finalizadas" color="#0e9577" />
       </View>
+
       <FlatList
         data={tasks}
         keyExtractor={(item, index) => index.toString()}
@@ -83,8 +93,8 @@ export default function Home() {
         )}
         ListEmptyComponent={() => (
           <View>
-            <Text>Você ainda não cadastrou Tarefas </Text>
-            <Text>Crie uma Tarefa para começar </Text>
+            <Text>Você ainda não cadastrou Tarefas</Text>
+            <Text>Crie uma Tarefa para começar</Text>
           </View>
         )}
       />
