@@ -1,16 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { InputAddTask } from '../../components/InputAddTask';
 import { CardNumber } from '../../components/CardNumber';
 import { Task } from '../../components/Task';
+import { TaskContext } from '../../context/TaskContext';
+import { TaskProps } from '../../utils/types';
 type Task = {
   description: string;
   check: boolean;
 };
 export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, createTask, setTasks } = useContext(TaskContext);
+
   const [tarefa, setTarefa] = useState('');
   const [tasksText, setTasksText] = useState('');
   const [countTask, setCountTask] = useState(0);
@@ -22,31 +25,31 @@ export default function Home() {
     if (tasksText === '') {
       return Alert.alert('Erro', 'Tarefa sem descrição');
     }
-    if (tasks.some((tasks) => tasks.description === tasksText)) {
+    if (tasks.some((tasks) => tasks.title === tasksText)) {
       return Alert.alert('Erro', 'Tarefa já existe');
     }
 
-    const newTask = { description: tasksText, check: false };
-    setTasks([...tasks, newTask]);
+    createTask(tasksText);
     setTasksText('');
   }
 
-  const handleTaskChangeStatus = (taskToChange: Task) => {
-    const updatedTasks = tasks.filter((tasks) => tasks !== taskToChange);
+  const handleTaskChangeStatus = (taskToChange: TaskProps) => {
+    const updatedTasks = tasks.filter((tasks) => tasks.title !== taskToChange.title);
     const newTask = {
-      description: taskToChange.description,
-      check: !taskToChange.check,
+      id: taskToChange.id,
+      title: taskToChange.title,
+      status: !taskToChange.status,
     };
     updatedTasks.push(newTask);
     setTasks(updatedTasks);
   };
 
-  const handleTaskDelete = (taskToDelete: Task) => {
+  const handleTaskDelete = (taskToDelete: TaskProps) => {
     Alert.alert('Atenção', 'Deseja realmente remover a tarefa?', [
       {
         text: 'Sim',
         onPress: () => {
-          const updatedTasks = tasks.filter((tasks) => tasks != taskToDelete);
+          const updatedTasks = tasks.filter((tasks) => tasks.title != taskToDelete.title);
           setTasks(updatedTasks);
         },
       },
@@ -56,8 +59,8 @@ export default function Home() {
 
   useEffect(() => {
     let totalTasks = tasks.length;
-    const filterArrayTasksAbertas = tasks.filter((tasks) => tasks.check == false);
-    const filterArrayTasksFinalizadas = tasks.filter((tasks) => tasks.check == true);
+    const filterArrayTasksAbertas = tasks.filter((tasks) => tasks.status == false);
+    const filterArrayTasksFinalizadas = tasks.filter((tasks) => tasks.status == true);
     if (filterArrayTasksAbertas) setCountTaskAberta(filterArrayTasksAbertas.length);
     if (filterArrayTasksFinalizadas) setCountTaskFinalizada(filterArrayTasksFinalizadas.length);
     setCountTask(totalTasks);
@@ -76,13 +79,7 @@ export default function Home() {
         data={tasks}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <Task
-            title={item.description}
-            status={item.check}
-            onCheck={() => handleTaskChangeStatus(item)}
-            onRemove={() => handleTaskDelete(item)}
-            id={0}
-          />
+          <Task title={item.title} status={item.status} onCheck={() => handleTaskChangeStatus(item)} onRemove={() => handleTaskDelete(item)} id={0} />
         )}
         ListEmptyComponent={() => (
           <View>

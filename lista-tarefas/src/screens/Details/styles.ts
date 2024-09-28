@@ -68,6 +68,6 @@ export const StatusText = styled.Text`
 export const StatusButtoDel = styled.View`
   background-color: #f22424;
   border-radius: 4px;
-  gap: 16;
+  gap: 16px;
   padding: 16px;
 `;
