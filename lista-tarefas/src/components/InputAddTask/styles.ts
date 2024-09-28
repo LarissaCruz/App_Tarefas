@@ -10,6 +10,8 @@ export const Input = styled.TextInput`
   flex: 1;
   padding: 16px;
   border-radius: 4px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
   color: #fff;
 `;
 
@@ -19,4 +21,6 @@ export const InputButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   border-radius: 4px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
 `;

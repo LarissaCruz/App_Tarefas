@@ -7,16 +7,16 @@ export const Container = styled.View`
   background-color: #fff;
   border-radius: 4px;
   overflow: hidden;
-  gap: 8;
+  gap: 8px;
 `;
 
 export const CardTitle = styled.Text`
   color: #1e1e1e;
-  font-size: 16;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 500px;
 `;
 export const CardValue = styled.Text`
   color: #1e1e1e;
-  font-size: 24;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 600px;
 `;

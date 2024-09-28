@@ -1,11 +1,11 @@
 import { Text, View } from 'react-native';
 import { CardTitle, CardValue, Container } from './styles';
 
-export function CardNumber() {
+export function CardNumber({ value }: any) {
   return (
     <Container>
       <CardTitle>Tarefas:</CardTitle>
-      <CardValue>4</CardValue>
+      <CardValue>{value}</CardValue>
     </Container>
   );
 }
