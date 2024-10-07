@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParmList } from '../../utils/types';
 import {
   Container,
+  Label,
   StatusButtoDel,
   StatusCard,
   StatusContainer,
@@ -19,24 +20,25 @@ import Feather from '@expo/vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { useContext } from 'react';
 import { TaskContext } from '../../context/TaskContext';
+import { Text } from 'react-native';
 type Props = NativeStackScreenProps<RootStackParmList>;
 
 export default function Details() {
   const { task } = useContext(TaskContext);
-
+  console.log(task);
   const navigation = useNavigation<Props['navigation']>();
 
   return (
     <Container>
-      <TopContainer>
-        <TopButton onPress={() => navigation.popToTop()}>
-          <Feather name="chevron-left" size={24} color="white" />
-          <TopText>Voltar</TopText>
-        </TopButton>
-      </TopContainer>
+      <Label>Titulo:</Label>
       <TitleContainer>
-        <Title>{task.title}</Title>
+        <Text>{task.title}</Text>
       </TitleContainer>
+      <Label>Descrição:</Label>
+      <TitleContainer>
+        <Text>{task.descricao}</Text>
+      </TitleContainer>
+
       <TextStatus>Status da Tarefa</TextStatus>
       <StatusContainer>
         <StatusCard>

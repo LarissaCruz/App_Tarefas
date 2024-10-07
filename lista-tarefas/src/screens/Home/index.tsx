@@ -1,30 +1,40 @@
 import { StatusBar } from 'expo-status-bar';
-import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
+import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
-import { InputAddTask } from '../../components/InputAddTask';
 import { CardNumber } from '../../components/CardNumber';
 import { Task } from '../../components/Task';
 import { TaskContext } from '../../context/TaskContext';
-import { TaskProps } from '../../utils/types';
+import { RootStackParmList, TaskProps } from '../../utils/types';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+type Props = NativeStackScreenProps<RootStackParmList>;
 
 export default function Home() {
   const { tasks, createTask, setTasks } = useContext(TaskContext);
-
   const [countTask, setCountTask] = useState(0);
   const [countTaskAberta, setCountTaskAberta] = useState(0);
   const [countTaskFinalizada, setCountTaskFinalizada] = useState(0);
+  const navigation = useNavigation<Props['navigation']>();
+  function handleCreatePress() {
+    navigation.navigate('Criar Tarefa');
+  }
+  function getDayOfWeek() {
+    const daysOfWeek = [
+      'Domingo', // 0
+      'Segunda-feira', // 1
+      'Terça-feira', // 2
+      'Quarta-feira', // 3
+      'Quinta-feira', // 4
+      'Sexta-feira', // 5
+      'Sábado', // 6
+    ];
 
-  const TaskScheme = Yup.object().shape({
-    tasksText: Yup.string().min(4, 'No mínimo 4 caracteres').max(16, 'No máximo 16 caracteres').required('Título da tarefa não pode ser vazio'),
-  });
+    const date = new Date(); // Cria uma nova instância de Date com a data e hora atuais
+    const dayIndex = date.getDay(); // Obtém o número do dia da semana (0-6)
 
-  function handleTaskAdd(tasksText: string) {
-    if (tasks.some((task) => task.title === tasksText)) {
-      return Alert.alert('Erro', 'Tarefa já existe');
-    }
-    createTask(tasksText);
+    return daysOfWeek[dayIndex]; // Retorna o nome do dia correspondente
   }
 
   const handleTaskChangeStatus = (taskToChange: TaskProps) => {
@@ -63,33 +73,32 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <Formik
-        initialValues={{ tasksText: '' }}
-        validationSchema={TaskScheme}
-        onSubmit={(values, { resetForm }) => {
-          handleTaskAdd(values.tasksText);
-          resetForm({ values: { tasksText: '' } });
-        }}
-      >
-        {({ handleSubmit, handleChange, handleBlur, values, errors, touched }) => (
-          <View>
-            <InputAddTask onChangeText={handleChange('tasksText')} value={values.tasksText} onPress={handleSubmit} onBlur={handleBlur('tasksText')} />
-            {touched.tasksText && errors.tasksText && <Text style={{ color: '#ff8477' }}>{errors.tasksText}</Text>}
-          </View>
-        )}
-      </Formik>
-
-      <View style={styles.row}>
-        <CardNumber value={countTask} title="Cadastradas" color="#1e1e1e" />
-        <CardNumber value={countTaskAberta} title="Em aberto" color="#e88a1a" />
-        <CardNumber value={countTaskFinalizada} title="Finalizadas" color="#0e9577" />
+      <View style={styles.header}>
+        <Text style={styles.dia}>{getDayOfWeek()}</Text>
+        <TouchableOpacity onPress={handleCreatePress}>
+          <AntDesign name="pluscircleo" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={styles.row}>
+          <CardNumber value={countTask} title="Cadastradas" color="#1e1e1e" />
+          <CardNumber value={countTaskAberta} title="Em aberto" color="#e88a1a" />
+          <CardNumber value={countTaskFinalizada} title="Finalizadas" color="#0e9577" />
+        </View>
       </View>
 
       <FlatList
         data={tasks}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <Task title={item.title} status={item.status} onCheck={() => handleTaskChangeStatus(item)} onRemove={() => handleTaskDelete(item)} id={0} />
+          <Task
+            title={item.title}
+            status={item.status}
+            descricao={item.descricao}
+            onCheck={() => handleTaskChangeStatus(item)}
+            onRemove={() => handleTaskDelete(item)}
+            id={0}
+          />
         )}
         ListEmptyComponent={() => (
           <View>
@@ -106,14 +115,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
-    backgroundColor: '#28385e',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: 'white',
+
     padding: 16,
     gap: 16,
+  },
+  header: {
+    flexDirection: 'row',
+
+    justifyContent: 'space-between',
   },
   row: {
     flexDirection: 'row',
     gap: 16,
   },
+  dia: { fontFamily: 'Poppins_500Medium', fontSize: 18, color: '#666' },
 });

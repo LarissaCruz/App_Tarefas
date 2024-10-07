@@ -7,7 +7,8 @@ interface TaskContextProps {
   tasks: TaskProps[];
   selectTask: (task: TaskProps) => void;
   clearTask: () => void;
-  createTask: (title: string) => void;
+  editTask: (id: string, title: string, descricao: string) => void;
+  createTask: (title: string, descricao: string) => void;
   setTasks: (tasks: TaskProps[]) => void;
 }
 
@@ -19,17 +20,19 @@ export const TaskContext = createContext<TaskContextProps>({
   task: {
     id: 0,
     title: '',
+    descricao: '',
     status: false,
   },
   tasks: [],
   selectTask: () => {},
   clearTask: () => {},
+  editTask: () => {},
   createTask: () => {},
   setTasks: () => {},
 });
 
 function TaskProvider({ children }: TaskProviderPros) {
-  const [task, setTask] = useState<TaskProps>({ id: 0, title: '', status: false });
+  const [task, setTask] = useState<TaskProps>({ id: 0, title: '', descricao: '', status: false }); // descrição adicionada
   const [tasks, setTasks] = useState<TaskProps[]>([] as TaskProps[]);
 
   async function storeTasks(tasks: TaskProps[]) {
@@ -39,6 +42,7 @@ function TaskProvider({ children }: TaskProviderPros) {
       console.log('error', error);
     }
   }
+
   async function loadTasks() {
     try {
       const tasks = await AsyncStorage.getItem('@tasks');
@@ -49,30 +53,39 @@ function TaskProvider({ children }: TaskProviderPros) {
       console.log('error', error);
     }
   }
-  function createTask(title: string) {
+
+  function createTask(title: string, descricao: string) {
     const newTask = {
       id: tasks.length + 1,
       title: title,
-      status: false,
+      descricao: descricao,
+      status: true,
     };
+
     setTasks([...tasks, newTask]);
+  }
+  function editTask(id: string, title: string, descricao: string) {
+    const updatedTasks = tasks.map((task) => (task.title === id ? { ...task, title, descricao } : task));
+
+    setTasks(updatedTasks);
   }
   function selectTask(task: TaskProps) {
     setTask(task);
   }
 
   function clearTask() {
-    setTask({ id: 0, title: '', status: false });
+    setTask({ id: 0, title: '', descricao: '', status: false });
   }
 
   useEffect(() => {
     loadTasks();
   }, []);
+
   useEffect(() => {
     storeTasks(tasks);
   }, [tasks]);
 
-  return <TaskContext.Provider value={{ task, selectTask, clearTask, tasks, setTasks, createTask }}>{children}</TaskContext.Provider>;
+  return <TaskContext.Provider value={{ editTask, task, selectTask, clearTask, tasks, setTasks, createTask }}>{children}</TaskContext.Provider>;
 }
 
 export default TaskProvider;

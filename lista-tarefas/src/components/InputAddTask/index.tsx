@@ -1,25 +1,27 @@
-import { Input, InputButton, InputContainer } from './styles';
-import Feather from '@expo/vector-icons/Feather';
+import { View } from 'react-native';
+import { Input, InputButton, InputContainer, Label } from './styles';
+
 type Props = {
-  onPress: () => void;
+  label: string;
+  placeholder: string;
   onChangeText: (text: string) => void;
   onBlur?: (e: any) => void;
   value: string;
 };
-export function InputAddTask({ onChangeText, value, onPress, onBlur }: Props) {
+export function InputAddTask({ onChangeText, value, onBlur, label, placeholder }: Props) {
   return (
-    <InputContainer>
-      <Input
-        placeholder="Digite Tarefa"
-        placeholderTextColor={'white'}
-        onBlur={onBlur}
-        keyboardType="default"
-        onChangeText={onChangeText}
-        value={value}
-      />
-      <InputButton onPress={onPress}>
-        <Feather name="plus-square" size={24} color="white" />
-      </InputButton>
-    </InputContainer>
+    <View>
+      <Label>{label}</Label>
+      <InputContainer>
+        <Input
+          placeholder={placeholder}
+          placeholderTextColor={'black'}
+          onBlur={onBlur}
+          keyboardType="default"
+          onChangeText={onChangeText}
+          value={value}
+        />
+      </InputContainer>
+    </View>
   );
 }

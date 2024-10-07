@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 
 export const Container = styled.View`
   flex: 1;
-  background-color: #28385e;
+  background-color: white;
   padding: 16px;
   padding-top: 64px;
   gap: 16px;
@@ -21,25 +21,29 @@ export const TopButton = styled.TouchableOpacity`
   gap: 16px;
 `;
 export const TopText = styled.Text`
-  color: #fff;
+  color: black;
   font-size: 16px;
 `;
 export const TitleContainer = styled.View`
-  background-color: #304163;
+  background-color: #dedede;
   border-radius: 4px;
   padding: 8px 16px;
 `;
 
 export const Title = styled.Text`
-  color: #fff;
+  color: black;
   font-size: 20px;
 `;
 
 export const TextStatus = styled.Text`
-  color: #fff;
+  color: black;
   font-size: 16px;
 `;
-
+export const Label = styled.Text`
+  font-weight: 600;
+  color: black;
+  font-size: 16px;
+`;
 export const StatusContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -48,7 +52,7 @@ export const StatusContainer = styled.View`
 
 export const StatusCard = styled.View`
   flex: 1;
-  background-color: #304163;
+  background-color: #dedede;
   border-radius: 4px;
   flex-direction: row;
   gap: 16px;
@@ -62,7 +66,7 @@ export const StatusTextContainer = styled.View`
   padding: 16px;
 `;
 export const StatusText = styled.Text`
-  color: #fff;
+  color: black;
   font-size: 16px;
 `;
 export const StatusButtoDel = styled.View`
