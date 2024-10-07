@@ -59,7 +59,7 @@ function TaskProvider({ children }: TaskProviderPros) {
       id: tasks.length + 1,
       title: title,
       descricao: descricao,
-      status: true,
+      status: false,
     };
 
     setTasks([...tasks, newTask]);

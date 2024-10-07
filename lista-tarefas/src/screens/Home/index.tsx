@@ -43,6 +43,7 @@ export default function Home() {
       id: taskToChange.id,
       title: taskToChange.title,
       status: !taskToChange.status,
+      descricao: taskToChange.descricao,
     };
     updatedTasks.push(newTask);
     setTasks(updatedTasks);
