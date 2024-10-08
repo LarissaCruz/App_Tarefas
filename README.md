@@ -35,6 +35,7 @@ $ git clone https://github.com/LarissaCruz/App_Tarefas.git
 
 # Acesse a pasta do projeto no terminal/cmd
 $ cd App_Tarefas
+$ cd lista-tarefas
 
 # Instale as dependências
 $ npm install
